@@ -25,7 +25,12 @@ function initFlappy(domID){
 
     var bio = [
                 "Hi, I'm Meyyappan",
-                "I study CS at UWaterloo"
+                "I study CS at UWaterloo",
+                "I love to code",               
+                "I made this using Phaser",
+                "This game is on Github",
+                "So you can contribute too!",
+                "Have fun!"
                 ];
 
     function preload(){
@@ -95,7 +100,7 @@ function initFlappy(domID){
         birdie.body.allowGravity = true;
         gameStarted = true;
         fingerTimer = game.time.create(false);
-        fingerTimer.loop(1000, spawnFingerPair, this);
+        fingerTimer.loop(1300, spawnFingerPair, this);
         fingerTimer.start();
         score = 0;
         scoreText.text = score;
@@ -134,7 +139,7 @@ function initFlappy(domID){
 
     function spawnFingerPair(){
         console.log("spawnFinger");
-        var distance = 500;
+        var distance = 400;
         var minFingerHeight = 10;
         var y = getRandomInt(distance + minFingerHeight, game.world.height - minFingerHeight);
         var bottomFinger = spawnFinger(y, false);
