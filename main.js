@@ -6,6 +6,7 @@ var xDim = 1400;
 var yDim = 1000;
 var birdieWeight = 650;
 var FLAP = 420;
+var SPEED = 300;
 
 var game = new Phaser.Game(xDim, yDim, Phaser.AUTO, '', states);
 
@@ -36,8 +37,10 @@ function create(){
     birdie.scale.setTo(birdieScale, birdieScale);
     game.input.onDown.add(flap);
 
+    fingers = game.add.group();
+
     // Enable physics on these sprites
-    game.physics.enable([birdie], Phaser.Physics.ARCADE);
+    game.physics.enable([birdie, fingers], Phaser.Physics.ARCADE);
     birdie.body.gravity.y = birdieWeight;
     birdie.body.collideWorldBounds = true;
 
@@ -63,6 +66,8 @@ function reset(){
     birdie.angle = 0;
     gameStarted = false;
     gameOver = false;
+    fingers.removeAll(true);
+    spawnFingerPair();
 }
 
 function beginGame(){
@@ -71,14 +76,42 @@ function beginGame(){
 }
 
 function endGame(){
+    console.log("executing endGame()");
     birdie.animations.stop('fly');
     gameOver = true;
     birdie.angle = 90;
+    birdie.body.velocity.x = 0;
+    fingers.setAll('body.velocity.x', 0);
+}
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function spawnFinger(fingerY, flipped){
+    var finger = fingers.create(game.world.width, fingerY, 'finger');
+    game.physics.enable([finger], Phaser.Physics.ARCADE);
+    finger.height = game.world.height;
+    finger.body.allowGravity = false;   
+    finger.body.velocity.x = -SPEED;
+    if (flipped){
+        finger.scale.y = -1;
+        finger.body.offset.y = -finger.body.height;
+    }
+}
+
+function spawnFingerPair(){
+    console.log("spawnFinger");
+    var distance = 500;
+    var minFingerHeight = 10;
+    var y = getRandomInt(distance + minFingerHeight, game.world.height - minFingerHeight);
+    spawnFinger(y, false);
+    spawnFinger(y - distance, true);    
 }
 
 function update(){
-    if(gameStarted){
-
+    //game.physics.arcade.collide(birdie, fingers, endGame);  
+    if(gameStarted && !gameOver){
         var MAX_ANGLE = 60;
         if (birdie.body.velocity.y <= -FLAP){
             birdie.angle = -MAX_ANGLE;
@@ -90,5 +123,15 @@ function update(){
         if(birdie.body.bottom >= game.world.bounds.bottom){
             endGame();
         }
+        /*
+        var boundsA = birdie.getBounds();
+        var boundsB = fingers.getBounds();
+
+        if (Phaser.Rectangle.intersects(boundsA, boundsB)){
+            endGame();
+        }
+        */
+        game.physics.arcade.overlap(birdie, fingers, endGame);
+
     }
 }
