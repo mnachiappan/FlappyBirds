@@ -16,7 +16,10 @@ function initFlappy(domID){
         gameOver,
         fingerTimer,
         score,
+        scoreText,
         invisibles;
+
+    var textStyle = { font: "65px Arial", fill: "#ff0044", align: "center" };
 
     function preload(){
         game.scale.maxWidth = xDim;
@@ -51,6 +54,8 @@ function initFlappy(domID){
         birdie.body.collideWorldBounds = true;
 
         game.stage.backgroundColor = '#DDEEFF';
+        
+        scoreText = game.add.text(game.world.centerX, 0, "0", textStyle);
 
         reset();
     }
@@ -75,6 +80,7 @@ function initFlappy(domID){
         fingers.removeAll(true);
         invisibles.removeAll(true);
         score = 0;
+        scoreText.text = score;
     }
 
     function beginGame(){
@@ -84,6 +90,7 @@ function initFlappy(domID){
         fingerTimer.loop(1000, spawnFingerPair, this);
         fingerTimer.start();
         score = 0;
+        scoreText.text = score;
     }
 
     function endGame(){
@@ -131,6 +138,7 @@ function initFlappy(domID){
 
     function incrementScore(_, invis){
         score += 1;
+        scoreText.text = score;
         invisibles.remove(invis);
         console.log (score);
     }
