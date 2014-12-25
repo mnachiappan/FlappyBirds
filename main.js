@@ -14,7 +14,9 @@ function initFlappy(domID){
     var birdie,
         gameStarted,
         gameOver,
-        fingerTimer;
+        fingerTimer,
+        score,
+        invisibles;
 
     function preload(){
         game.scale.maxWidth = xDim;
@@ -40,6 +42,8 @@ function initFlappy(domID){
         game.input.onDown.add(flap);
 
         fingers = game.add.group();
+
+        invisibles = game.add.group();
 
         // Enable physics on these sprites
         game.physics.enable([birdie, fingers], Phaser.Physics.ARCADE);
@@ -69,6 +73,8 @@ function initFlappy(domID){
         gameStarted = false;
         gameOver = false;
         fingers.removeAll(true);
+        invisibles.removeAll(true);
+        score = 0;
     }
 
     function beginGame(){
@@ -77,6 +83,7 @@ function initFlappy(domID){
         fingerTimer = game.time.create(false);
         fingerTimer.loop(1000, spawnFingerPair, this);
         fingerTimer.start();
+        score = 0;
     }
 
     function endGame(){
@@ -104,6 +111,7 @@ function initFlappy(domID){
             finger.scale.y = -1;
             finger.body.offset.y = -finger.body.height;
         }
+        return finger;
     }
 
     function spawnFingerPair(){
@@ -111,8 +119,20 @@ function initFlappy(domID){
         var distance = 500;
         var minFingerHeight = 10;
         var y = getRandomInt(distance + minFingerHeight, game.world.height - minFingerHeight);
-        spawnFinger(y, false);
-        spawnFinger(y - distance, true);    
+        var bottomFinger = spawnFinger(y, false);
+        spawnFinger(y - distance, true); 
+        var invis = invisibles.create(bottomFinger.x + bottomFinger.width, 0);
+        invis.width = 2;
+        invis.height = game.world.height;
+        game.physics.enable([invis], Phaser.Physics.ARCADE);
+        invis.body.allowGravity = false;
+        invis.body.velocity.x = -SPEED;
+    }
+
+    function incrementScore(_, invis){
+        score += 1;
+        invisibles.remove(invis);
+        console.log (score);
     }
 
     function update(){
@@ -130,7 +150,7 @@ function initFlappy(domID){
                 endGame();
             }
             game.physics.arcade.overlap(birdie, fingers, endGame);
-
+            game.physics.arcade.overlap(birdie, invisibles, incrementScore);
         }
     }
 
