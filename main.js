@@ -17,9 +17,16 @@ function initFlappy(domID){
         fingerTimer,
         score,
         scoreText,
-        invisibles;
+        invisibles,
+        bioText;
+    var bioIndex = 0;
 
     var textStyle = { font: "65px Arial", fill: "#ff0044", align: "center" };
+
+    var bio = [
+                "Hi, I'm Meyyappan",
+                "I study CS at UWaterloo"
+                ];
 
     function preload(){
         game.scale.maxWidth = xDim;
@@ -56,7 +63,7 @@ function initFlappy(domID){
         game.stage.backgroundColor = '#DDEEFF';
         
         scoreText = game.add.text(game.world.centerX, 0, "0", textStyle);
-
+        bioText = game.add.text(game.world.centerX, 50, "", textStyle);
         reset();
     }
 
@@ -81,6 +88,7 @@ function initFlappy(domID){
         invisibles.removeAll(true);
         score = 0;
         scoreText.text = score;
+        bioText.text = "";
     }
 
     function beginGame(){
@@ -91,6 +99,7 @@ function initFlappy(domID){
         fingerTimer.start();
         score = 0;
         scoreText.text = score;
+        bioText.text = "";
     }
 
     function endGame(){
@@ -101,6 +110,8 @@ function initFlappy(domID){
         birdie.angle = 90;
         birdie.body.velocity.x = 0;
         fingers.setAll('body.velocity.x', 0);
+        bioText.text = bio[bioIndex];
+        bioIndex = Math.min(bioIndex + 1, bio.length - 1);
     }
 
     function getRandomInt(min, max) {
@@ -144,7 +155,6 @@ function initFlappy(domID){
     }
 
     function update(){
-        //game.physics.arcade.collide(birdie, fingers, endGame);  
         if(gameStarted && !gameOver){
             var MAX_ANGLE = 60;
             if (birdie.body.velocity.y <= -FLAP){
