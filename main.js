@@ -12,7 +12,8 @@ var game = new Phaser.Game(xDim, yDim, Phaser.AUTO, '', states);
 
 var birdie,
     gameStarted,
-    gameOver;
+    gameOver,
+    fingerTimer;
 
 function preload(){
     game.scale.maxWidth = xDim;
@@ -67,16 +68,19 @@ function reset(){
     gameStarted = false;
     gameOver = false;
     fingers.removeAll(true);
-    spawnFingerPair();
 }
 
 function beginGame(){
     birdie.body.allowGravity = true;
     gameStarted = true;
+    fingerTimer = game.time.create(false);
+    fingerTimer.loop(1000, spawnFingerPair, this);
+    fingerTimer.start();
 }
 
 function endGame(){
     console.log("executing endGame()");
+    fingerTimer.stop();
     birdie.animations.stop('fly');
     gameOver = true;
     birdie.angle = 90;
@@ -94,6 +98,7 @@ function spawnFinger(fingerY, flipped){
     finger.height = game.world.height;
     finger.body.allowGravity = false;   
     finger.body.velocity.x = -SPEED;
+    finger.scale.x = 2;
     if (flipped){
         finger.scale.y = -1;
         finger.body.offset.y = -finger.body.height;
@@ -123,14 +128,6 @@ function update(){
         if(birdie.body.bottom >= game.world.bounds.bottom){
             endGame();
         }
-        /*
-        var boundsA = birdie.getBounds();
-        var boundsB = fingers.getBounds();
-
-        if (Phaser.Rectangle.intersects(boundsA, boundsB)){
-            endGame();
-        }
-        */
         game.physics.arcade.overlap(birdie, fingers, endGame);
 
     }
